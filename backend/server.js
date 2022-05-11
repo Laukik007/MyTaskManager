@@ -3,6 +3,7 @@ const userRoutes = require("./routes/userRoutes");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const taskRoutes = require("./routes/taskRoutes");
+const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.get("/api/Tasks/:id", (req, res) => {
   res.send(Task);
 });
 
+app.use(notFound);
+app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`server started on port ${PORT}`));
