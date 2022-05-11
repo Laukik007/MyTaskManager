@@ -47,7 +47,9 @@ function Login() {
   console.log(error);
 
   useEffect(() => {
-    //history('/mynotes')
+    if (userInfo) {
+      history("/mynotes");
+    }
   }, [userInfo]);
 
   const handleGuest = () => {

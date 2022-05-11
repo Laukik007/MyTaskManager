@@ -37,7 +37,9 @@ function Signup() {
     setOpen(false);
   };
   useEffect(() => {
-    //history('/mynotes')
+    if (userInfo) {
+      history("/mynotes");
+    }
   }, [userInfo]);
   const handleClick = async (e) => {
     e.preventDefault();

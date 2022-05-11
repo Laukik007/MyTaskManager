@@ -26,7 +26,8 @@ import Mynotes from "../Components/SingleView/Mynotes";
 import Myprofile from "../Components/SingleView/Myprofile";
 import Explore from "../Components/SingleView/Explore";
 import About from "../Components/SingleView/About";
-
+import { logout } from "../actions/userAction";
+import { useDispatch, useSelector } from "react-redux";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
@@ -75,6 +76,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function Homepage() {
+  const dispatch = useDispatch();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [tab, setTab] = React.useState(0);
@@ -82,7 +84,9 @@ export default function Homepage() {
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
+  const logoutHandler = () => {
+    dispatch(logout());
+  };
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -206,7 +210,10 @@ export default function Homepage() {
           </ListItem>
           <ListItem
             disablePadding
-            onClick={() => setTab(3)}
+            onClick={() => {
+              setTab(3);
+              logoutHandler();
+            }}
             style={
               tab == 3
                 ? {
