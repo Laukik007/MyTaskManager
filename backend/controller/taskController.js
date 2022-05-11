@@ -1,8 +1,9 @@
 const Task = require("../models/taskModel");
 const asyncHandler = require("express-async-handler");
+const User = require("../models/userModel");
 
 const getTasks = asyncHandler(async (req, res) => {
-  const Tasks = await Task.find({ user: req.user._id });
+  const Tasks = await Task.find({ user: req.user._id }).populate("user");
   res.json(Tasks);
 });
 
@@ -19,6 +20,8 @@ const getTaskById = asyncHandler(async (req, res) => {
 });
 
 const CreateTask = asyncHandler(async (req, res) => {
+  // console.log(req);
+  // console.log(req.user._id);
   const { title, content, category, public, task_status } = req.body;
   console.log("hello from createtask");
   if (!title || !content || !category) {
@@ -34,8 +37,25 @@ const CreateTask = asyncHandler(async (req, res) => {
       public,
       task_status,
     });
-    console.log(newtask);
+    // console.log(newtask);
     const createdTask = await newtask.save();
+    const useer = await User.findById(req.user._id);
+    useer.taskcreated.push(createdTask.id);
+    useer.save();
+    console.log("user id", req.user._id);
+    console.log("task id", createdTask._id);
+    User.updateOne(
+      { _id: req.user._id },
+      {
+        $push: { taskcreated: createdTask._id },
+      },
+      {
+        function(error, success) {
+          console.log(error);
+          console.log(success);
+        },
+      }
+    );
     console.log(createdTask);
     res.status(201).json(createdTask);
   }

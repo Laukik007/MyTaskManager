@@ -13,11 +13,11 @@ const taskSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    // user: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: "User",
-    // },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
     // lastUpdatedBy: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   required: true,
