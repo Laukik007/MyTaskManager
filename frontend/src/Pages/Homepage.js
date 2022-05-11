@@ -27,27 +27,9 @@ import Myprofile from "../Components/SingleView/Myprofile";
 import Explore from "../Components/SingleView/Explore";
 import About from "../Components/SingleView/About";
 import { logout } from "../actions/userAction";
-import { useDispatch, useSelector } from "react-redux";
-const drawerWidth = 240;
+import { useDispatch } from "react-redux";
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${drawerWidth}px`,
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
-  })
-);
+const drawerWidth = "240px";
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -92,8 +74,7 @@ export default function Homepage() {
   };
 
   return (
-    <Box
-      sx={{ display: "flex" }}
+    <div
       style={{
         background: ` linear-gradient(rgba(255,255,255,.5), rgba(255,255,255,.5)),url(${background}) top left / cover no-repeat`,
         width: "100%",
@@ -103,173 +84,176 @@ export default function Homepage() {
         // alignItems: "center",
       }}
     >
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Kal kar lete hai != success
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar open={open}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{ mr: 2, ...(open && { display: "none" }) }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              Kal kar lete hai != success
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          sx={{
             width: drawerWidth,
-            boxSizing: "border-box",
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          <ListItem
-            disablePadding
-            onClick={() => setTab(0)}
-            style={
-              tab == 0
-                ? {
-                    backgroundColor: "rgb(25,118,210)",
-                    borderTopRightRadius: "24px",
-                    borderBottomRightRadius: "24px",
-                    color: "white",
-                  }
-                : {}
-            }
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <NoteAltIcon style={tab == 0 ? { color: "white" } : {}} />
-              </ListItemIcon>
-              <ListItemText primary={"My Notes"} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            disablePadding
-            onClick={() => setTab(1)}
-            style={
-              tab == 1
-                ? {
-                    backgroundColor: "rgb(25,118,210)",
-                    borderTopRightRadius: "24px",
-                    borderBottomRightRadius: "24px",
-                    color: "white",
-                  }
-                : {}
-            }
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <ExploreIcon style={tab == 1 ? { color: "white" } : {}} />
-              </ListItemIcon>
-              <ListItemText primary={"Explore"} />
-            </ListItemButton>
-          </ListItem>
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+              boxSizing: "border-box",
+            },
+          }}
+          // variant="persistent"
+          anchor="left"
+          onClose={() => setOpen(false)}
+          open={open}
+        >
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "ltr" ? (
+                <ChevronLeftIcon />
+              ) : (
+                <ChevronRightIcon />
+              )}
+            </IconButton>
+          </DrawerHeader>
           <Divider />
-          <ListItem
-            disablePadding
-            onClick={() => setTab(2)}
-            style={
-              tab == 2
-                ? {
-                    backgroundColor: "rgb(25,118,210)",
-                    borderTopRightRadius: "24px",
-                    borderBottomRightRadius: "24px",
-                    color: "white",
-                  }
-                : {}
-            }
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <AccountCircleIcon style={tab == 2 ? { color: "white" } : {}} />
-              </ListItemIcon>
-              <ListItemText primary={"My Profile"} />
-            </ListItemButton>
-          </ListItem>
-          <ListItem
-            disablePadding
-            onClick={() => {
-              setTab(3);
-              logoutHandler();
-            }}
-            style={
-              tab == 3
-                ? {
-                    backgroundColor: "rgb(25,118,210)",
-                    borderTopRightRadius: "24px",
-                    borderBottomRightRadius: "24px",
-                    color: "white",
-                  }
-                : {}
-            }
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <LogoutIcon style={tab == 3 ? { color: "white" } : {}} />
-              </ListItemIcon>
-              <ListItemText primary={"Log Out"} />
-            </ListItemButton>
-          </ListItem>
-          <Divider />
-          <ListItem
-            disablePadding
-            onClick={() => setTab(4)}
-            style={
-              tab == 4
-                ? {
-                    backgroundColor: "rgb(25,118,210)",
-                    borderTopRightRadius: "24px",
-                    borderBottomRightRadius: "24px",
-                    color: "white",
-                  }
-                : {}
-            }
-          >
-            <ListItemButton>
-              <ListItemIcon>
-                <InfoIcon style={tab == 4 ? { color: "white" } : {}} />
-              </ListItemIcon>
-              <ListItemText primary={"About"} />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </Drawer>
-      <Main open={open}>
+          <List>
+            <ListItem
+              disablePadding
+              onClick={() => setTab(0)}
+              style={
+                tab == 0
+                  ? {
+                      backgroundColor: "rgb(25,118,210)",
+                      borderTopRightRadius: "24px",
+                      borderBottomRightRadius: "24px",
+                      color: "white",
+                    }
+                  : {}
+              }
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <NoteAltIcon style={tab == 0 ? { color: "white" } : {}} />
+                </ListItemIcon>
+                <ListItemText primary={"My Notes"} />
+              </ListItemButton>
+            </ListItem>
+            <ListItem
+              disablePadding
+              onClick={() => setTab(1)}
+              style={
+                tab == 1
+                  ? {
+                      backgroundColor: "rgb(25,118,210)",
+                      borderTopRightRadius: "24px",
+                      borderBottomRightRadius: "24px",
+                      color: "white",
+                    }
+                  : {}
+              }
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <ExploreIcon style={tab == 1 ? { color: "white" } : {}} />
+                </ListItemIcon>
+                <ListItemText primary={"Explore"} />
+              </ListItemButton>
+            </ListItem>
+            <Divider />
+            <ListItem
+              disablePadding
+              onClick={() => setTab(2)}
+              style={
+                tab == 2
+                  ? {
+                      backgroundColor: "rgb(25,118,210)",
+                      borderTopRightRadius: "24px",
+                      borderBottomRightRadius: "24px",
+                      color: "white",
+                    }
+                  : {}
+              }
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <AccountCircleIcon
+                    style={tab == 2 ? { color: "white" } : {}}
+                  />
+                </ListItemIcon>
+                <ListItemText primary={"My Profile"} />
+              </ListItemButton>
+            </ListItem>
+            <ListItem
+              disablePadding
+              onClick={() => {
+                setTab(3);
+                logoutHandler();
+              }}
+              style={
+                tab == 3
+                  ? {
+                      backgroundColor: "rgb(25,118,210)",
+                      borderTopRightRadius: "24px",
+                      borderBottomRightRadius: "24px",
+                      color: "white",
+                    }
+                  : {}
+              }
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <LogoutIcon style={tab == 3 ? { color: "white" } : {}} />
+                </ListItemIcon>
+                <ListItemText primary={"Log Out"} />
+              </ListItemButton>
+            </ListItem>
+            <Divider />
+            <ListItem
+              disablePadding
+              onClick={() => setTab(4)}
+              style={
+                tab == 4
+                  ? {
+                      backgroundColor: "rgb(25,118,210)",
+                      borderTopRightRadius: "24px",
+                      borderBottomRightRadius: "24px",
+                      color: "white",
+                    }
+                  : {}
+              }
+            >
+              <ListItemButton>
+                <ListItemIcon>
+                  <InfoIcon style={tab == 4 ? { color: "white" } : {}} />
+                </ListItemIcon>
+                <ListItemText primary={"About"} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Drawer>
         <DrawerHeader />
-        <div>
-          {tab == 0 ? (
-            <Mynotes />
-          ) : tab == 1 ? (
-            <Explore />
-          ) : tab == 2 ? (
-            <Myprofile />
-          ) : tab == 4 ? (
-            <About />
-          ) : null}
-        </div>
-      </Main>
-    </Box>
+      </Box>
+      <div>
+        {tab == 0 ? (
+          <Mynotes />
+        ) : tab == 1 ? (
+          <Explore />
+        ) : tab == 2 ? (
+          <Myprofile />
+        ) : tab == 4 ? (
+          <About />
+        ) : null}
+      </div>
+    </div>
   );
 }

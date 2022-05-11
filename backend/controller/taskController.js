@@ -15,8 +15,6 @@ const getTaskById = asyncHandler(async (req, res) => {
   } else {
     res.status(404).json({ message: "Task not found" });
   }
-
-  res.json(Task);
 });
 
 const CreateTask = asyncHandler(async (req, res) => {
