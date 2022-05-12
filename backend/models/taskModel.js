@@ -25,11 +25,11 @@ const taskSchema = mongoose.Schema(
     // },
     public: {
       type: Boolean,
-      required: true,
+      default: true,
     },
     task_status: {
       type: Boolean,
-      default: true,
+      required: true,
     },
   },
   {

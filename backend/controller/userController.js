@@ -12,8 +12,7 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin,
-      pic: user.pic,
+      profile_pic: user.profile_pic,
       token: generateToken(user._id),
     });
   } else {
@@ -24,6 +23,7 @@ const authUser = asyncHandler(async (req, res) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, pic } = req.body;
+  console.log(req.body);
 
   const userExists = await User.findOne({ email });
 
@@ -33,10 +33,10 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({
-    name,
-    email,
-    password,
-    pic,
+    name: name,
+    email: email,
+    password: password,
+    profile_pic: pic,
   });
 
   if (user) {
@@ -44,8 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin,
-      pic: user.pic,
+      profile_pic: user.profile_pic,
       token: generateToken(user._id),
     });
   } else {
@@ -53,5 +52,15 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 });
-console.log(typeof authUser);
-module.exports = { registerUser, authUser };
+
+const getProfile = async (req, res) => {
+  const user_id = req.body._id;
+  const profile = await User.findById(user_id);
+  if (profile) {
+    res.json(profile);
+  } else {
+    res.status(404).json({ message: "Profile Not Found" });
+  }
+};
+// console.log(typeof authUser);
+module.exports = { registerUser, authUser, getProfile };

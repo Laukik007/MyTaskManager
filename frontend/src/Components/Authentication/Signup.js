@@ -20,14 +20,43 @@ function Signup() {
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
-  const [file, setFile] = useState(
+  const [pic, setFile] = useState(
     "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg"
   );
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const history = useNavigate();
-  const userRegister = useSelector((state) => state.userRegister);
+  const userRegister = useSelector((state) => state.userLogin);
   const { userInfo, loading, error } = userRegister;
+  const [picLoading, setPicLoading] = useState(false);
+  const [snack, setSnack] = useState(false);
+  const postDetails = (pics) => {
+    setPicLoading(true);
+    if (pics.type === "image/jpeg" || pics.type === "image/png") {
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", `${process.env.REACT_APP_CLOUD_NAME}`);
+      fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`,
+        {
+          method: "post",
+          body: data,
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("pic url = ", data.url.toString());
+          setFile(data.url.toString());
+          setPicLoading(false);
+          setSnack(true);
+        })
+        .catch((err) => {
+          console.log(err);
+          setPicLoading(false);
+        });
+    }
+  };
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -35,26 +64,43 @@ function Signup() {
     }
 
     setOpen(false);
+    setSnack(false);
   };
   useEffect(() => {
     if (userInfo) {
+      setOpen(true);
       history("/mynotes");
     }
   }, [userInfo]);
   const handleClick = async (e) => {
     e.preventDefault();
 
-    await dispatch(register(name, email, password, file));
+    await dispatch(register(name, email, password, pic));
     if (userInfo) {
       setOpen(true);
     }
   };
-  console.log(error);
+  // console.log(error);
   return (
     <div>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          This is a success message!
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleClose} severity="success">
+          Account Created Successfully!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={snack}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleClose} severity="success">
+          Image Uploaded Successfully!
         </Alert>
       </Snackbar>
       <Card varient="outlined" sx={{ p: 3 }}>
@@ -132,7 +178,7 @@ function Signup() {
               type="file"
               accept="image/*"
               hidden
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={(e) => postDetails(e.target.files[0])}
             />
           </Button>
         </CardContent>
@@ -141,7 +187,7 @@ function Signup() {
             fullWidth={true}
             variant="contained"
             color="primary"
-            loading={loading}
+            loading={loading || picLoading}
             onClick={handleClick}
             endIcon={<PersonAddIcon />}
             loadingPosition="end"

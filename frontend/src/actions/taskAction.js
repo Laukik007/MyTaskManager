@@ -49,7 +49,7 @@ export const listtask = () => async (dispatch, getState) => {
 };
 
 export const createtaskAction =
-  (title, content, category) => async (dispatch, getState) => {
+  (title, content, category, taskstatus) => async (dispatch, getState) => {
     console.log("hi from creation");
     try {
       dispatch({
@@ -69,7 +69,12 @@ export const createtaskAction =
 
       const { data } = await axios.post(
         `/api/tasks/create`,
-        { title, content, category },
+        {
+          title: title,
+          content: content,
+          category: category,
+          task_status: taskstatus,
+        },
         config
       );
 
@@ -106,7 +111,7 @@ export const deletetaskAction = (id) => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.delete(`/api/task/${id}`, config);
+    const { data } = await axios.delete(`/api/tasks/${id}`, config);
 
     dispatch({
       type: TASK_DELETE_SUCCESS,
@@ -143,7 +148,7 @@ export const updatetaskAction =
       };
 
       const { data } = await axios.put(
-        `/api/task/${id}`,
+        `/api/tasks/${id}`,
         { title, content, category },
         config
       );

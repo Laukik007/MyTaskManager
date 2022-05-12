@@ -7,6 +7,7 @@ import {
   getFormGroupUtilityClass,
   IconButton,
   InputAdornment,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
@@ -41,6 +42,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
 
   const userLogin = useSelector((state) => state.userLogin);
   const { loading, error, userInfo } = userLogin;
@@ -48,6 +50,7 @@ function Login() {
 
   useEffect(() => {
     if (userInfo) {
+      setOpen(true);
       history("/mynotes");
     }
   }, [userInfo]);
@@ -60,9 +63,26 @@ function Login() {
     e.preventDefault();
     dispatch(login(email, password));
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   return (
     <Box>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert onClose={handleClose} severity="success">
+          Login Successfully!
+        </Alert>
+      </Snackbar>
       <Card varient="outlined" sx={{ p: 3 }}>
         <CardContent>
           {error && <Alert severity="error">{error}</Alert>}
