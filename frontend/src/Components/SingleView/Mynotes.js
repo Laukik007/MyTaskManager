@@ -5,19 +5,92 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  Alert,
   CardActionArea,
   CardHeader,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
   Grid,
   Slide,
+  Switch,
+  TextField,
 } from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
-import { listtask } from "../../actions/taskAction";
+import { listtask, deletetaskAction } from "../../actions/taskAction";
+import CloseIcon from "@mui/icons-material/Close";
+const IOSSwitch = styled((props) => (
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  "& .MuiSwitch-switchBase": {
+    padding: 0,
+    margin: 2,
+    transitionDuration: "300ms",
+    "&.Mui-checked": {
+      transform: "translateX(16px)",
+      color: "#fff",
+      "& + .MuiSwitch-track": {
+        backgroundColor: theme.palette.mode === "dark" ? "#2ECA45" : "#65C466",
+        opacity: 1,
+        border: 0,
+      },
+      "&.Mui-disabled + .MuiSwitch-track": {
+        opacity: 0.5,
+      },
+    },
+    "&.Mui-focusVisible .MuiSwitch-thumb": {
+      color: "#33cf4d",
+      border: "6px solid #fff",
+    },
+    "&.Mui-disabled .MuiSwitch-thumb": {
+      color:
+        theme.palette.mode === "light"
+          ? theme.palette.grey[100]
+          : theme.palette.grey[600],
+    },
+    "&.Mui-disabled + .MuiSwitch-track": {
+      opacity: theme.palette.mode === "light" ? 0.7 : 0.3,
+    },
+  },
+  "& .MuiSwitch-thumb": {
+    boxSizing: "border-box",
+    width: 22,
+    height: 22,
+  },
+  "& .MuiSwitch-track": {
+    borderRadius: 26 / 2,
+    backgroundColor: theme.palette.mode === "light" ? "#FF3B30" : "#FF453A",
+    opacity: 1,
+    transition: theme.transitions.create(["background-color"], {
+      duration: 500,
+    }),
+  },
+}));
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+const colors = [
+  "#1BAAA0",
+  "#7DDDF5",
+  "#FBC396",
+  "#FFBB2F",
+  "#FFD275",
+  "#FC91AD",
+  "#3FBF595",
+  "#7FBBDF",
+  "#8DD7F2",
+];
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -25,96 +98,194 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
+  },
+  cardheader: {
+    width: "250px",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    display: "inline-block",
+    textOverflow: "ellipsis",
   },
 }));
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
-function Mynotes() {
+const Mynotes = React.memo(function Mynotes() {
   const dispatch = useDispatch();
   const taskList = useSelector((state) => state.taskList);
   const { TASK } = taskList;
   const classes = useStyles();
   console.log(TASK);
   const [open, setOpen] = useState(false);
+  const [modalObj, setModalObj] = useState(null);
+  const [title, setTitle] = React.useState("");
+  const [content, setContent] = React.useState("");
+  const [category, setCategory] = React.useState("");
+  const [taskstatus, setTaskstatus] = React.useState(false);
   useEffect(() => {
     dispatch(listtask());
   }, []);
 
-  const handleClick = () => {
+  const handleClick = (taskObj) => {
+    setModalObj(taskObj);
+    setTaskstatus(taskObj?.task_status);
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
+  const handleChange = () => {
+    setTaskstatus(!taskstatus);
+  };
+  const resetHandler = () => {};
+  const submitHandler = () => {};
+  const handledelete = (id) => {
+    dispatch(deletetaskAction(id));
+  };
   return (
     <>
-      <Dialog
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
+      <div>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          scroll={"paper"}
+          aria-labelledby="scroll-dialog-title"
+          aria-describedby="scroll-dialog-description"
+          maxWidth={"md"}
+          fullWidth
+        >
+          <DialogTitle style={{ margin: "2%", padding: "0px 9px" }}>
+            <Grid container justifyContent="space-between" alignItems="center">
+              <Typography variant="div">Edit Task</Typography>
+              <CloseIcon onClick={handleClose} style={{ cursor: "pointer" }} />
+            </Grid>
+          </DialogTitle>
+          <DialogContent style={{ overflow: "hidden" }}>
+            <TextField
+              variant="outlined"
+              label="Title"
+              fullWidth
+              value={modalObj?.title}
+              onChange={(e) => setTitle(e.target.value)}
+              sx={{ m: 1 }}
+            />
+            <TextField
+              label="Category"
+              fullWidth
+              value={modalObj?.category}
+              onChange={(e) => setCategory(e.target.value)}
+              sx={{ m: 1 }}
+            />
+            <TextField
+              label="Task"
+              multiline
+              fullWidth
+              maxRows={8}
+              value={modalObj?.content}
+              sx={{ m: 1 }}
+              onChange={(e) => setContent(e.target.value)}
+            />
+            <FormControlLabel
+              label={
+                taskstatus
+                  ? "Task Status : Completed"
+                  : "Task Sharing : In Progress"
+              }
+              labelPlacement="start"
+              control={
+                <IOSSwitch
+                  checked={taskstatus}
+                  onChange={handleChange}
+                  inputProps={{
+                    "aria-label": "controlled",
+                  }}
+                  sx={{ m: 1 }}
+                />
+              }
+            />
+            <Alert severity={taskstatus ? "success" : "info"}>
+              {taskstatus
+                ? "This task will be marked as completed"
+                : "Looks like you are still working on it."}
+            </Alert>
+          </DialogContent>
+
+          <DialogActions>
+            <Button variant="contained" color="error" onClick={resetHandler}>
+              Discard changes
+            </Button>
+            <Button variant="contained" onClick={submitHandler}>
+              Save Changes
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+      <Grid
+        container
+        alignItems="stretch"
+        direction="row"
+        justifyContent={"space-around"}
       >
-        <DialogTitle>{"Use Google's location service?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            Let Google help apps determine location. This means sending
-            anonymous location data to Google, even when no apps are running.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose}>Agree</Button>
-        </DialogActions>
-      </Dialog>
-      <Grid container alignItems="stretch" direction="row">
-        {TASK != undefined
-          ? TASK.map((taskObj) => (
-              <Grid item>
-                <Card
-                  onClick={handleClick}
-                  className={classes.card}
-                  sx={{ width: 300 }}
-                >
-                  <CardActionArea>
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="h2">
-                        {<b>{(taskObj?.title).slice(0, 40)}</b>}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        component="p"
-                      >
-                        {(taskObj?.content).slice(0, 40)}
-                      </Typography>
-                    </CardContent>
-                    <CardActions
-                      style={{
-                        padding: "0.4rem",
-                        backgroundColor: "#F9F9F9",
-                      }}
+        {TASK != undefined ? (
+          TASK.map((taskObj, idx) => (
+            <Grid item key={idx}>
+              <Card
+                className={classes.card}
+                sx={{ width: 270 }}
+                style={{ backgroundColor: colors[idx % 9] }}
+              >
+                <CardActionArea>
+                  <CardHeader
+                    title={taskObj?.title}
+                    className={classes.cardheader}
+                  />
+                  <CardContent onClick={() => handleClick(taskObj)}>
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      style={{ wordWrap: "break-word" }}
                     >
+                      Category : {taskObj?.category}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      component="div"
+                      style={{ wordWrap: "break-word" }}
+                    >
+                      Task:
+                    </Typography>
+                    {(taskObj?.content).split("\n").map((line, idx) => (
                       <Typography
+                        key={idx}
+                        variant="body2"
+                        component="div"
                         style={{
-                          display: "flex",
-                          alignItems: "center",
+                          wordWrap: "break-word",
                         }}
                       >
-                        Hello
+                        {line}
                       </Typography>
-                    </CardActions>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            ))
-          : null}
+                    ))}
+                  </CardContent>
+                  <CardActions style={{ justifyContent: "right" }}>
+                    <Button
+                      onClick={() => handleClick(taskObj)}
+                      startIcon={<EditIcon style={{ color: "black" }} />}
+                    ></Button>
+                    <Button
+                      onClick={() => handledelete(taskObj?._id)}
+                      startIcon={<DeleteIcon style={{ color: "black" }} />}
+                    ></Button>
+                  </CardActions>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <CircularProgress />
+        )}
       </Grid>
     </>
   );
-}
+});
 
 export default Mynotes;
