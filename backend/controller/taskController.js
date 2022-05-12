@@ -7,13 +7,17 @@ const getTasks = asyncHandler(async (req, res) => {
   res.json(Tasks);
 });
 
-const getTaskById = asyncHandler(async (req, res) => {
-  const Tasks = await Task.findById(req.params.id);
+const getTaskExplore = asyncHandler(async (req, res) => {
+  const { userId } = req.body;
+
+  const Tasks = await Task.find({
+    $or: [{ public: true }, { user: userId }],
+  }).populate("user");
 
   if (Tasks) {
     res.json(Tasks);
   } else {
-    res.status(404).json({ message: "Task not found" });
+    res.status(404).json({ message: "No Task found " });
   }
 });
 
@@ -77,7 +81,7 @@ const DeleteTask = asyncHandler(async (req, res) => {
 });
 
 const UpdateTask = asyncHandler(async (req, res) => {
-  const { title, content, category } = req.body;
+  const { title, content, category, task_status } = req.body;
 
   const Tasks = await Task.findById(req.params.id);
 
@@ -90,8 +94,9 @@ const UpdateTask = asyncHandler(async (req, res) => {
     Tasks.title = title;
     Tasks.content = content;
     Tasks.category = category;
+    Tasks.task_status = task_status;
 
-    const updatedTask = await Task.save();
+    const updatedTask = await Tasks.save();
     res.json(updatedTask);
   } else {
     res.status(404);
@@ -99,4 +104,10 @@ const UpdateTask = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { getTaskById, getTasks, CreateTask, DeleteTask, UpdateTask };
+module.exports = {
+  getTaskExplore,
+  getTasks,
+  CreateTask,
+  DeleteTask,
+  UpdateTask,
+};

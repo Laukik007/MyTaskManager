@@ -25,7 +25,11 @@ import {
 } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 import { makeStyles } from "@mui/styles";
-import { listtask, deletetaskAction } from "../../actions/taskAction";
+import {
+  listtask,
+  deletetaskAction,
+  updatetaskAction,
+} from "../../actions/taskAction";
 import CloseIcon from "@mui/icons-material/Close";
 const IOSSwitch = styled((props) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -121,6 +125,9 @@ const Mynotes = React.memo(function Mynotes() {
   const [content, setContent] = React.useState("");
   const [category, setCategory] = React.useState("");
   const [taskstatus, setTaskstatus] = React.useState(false);
+  const [tempTitle, setTempTitle] = useState("");
+  const [tempContent, setTempContent] = useState("");
+  const [tempCategory, setTempCategory] = useState("");
   useEffect(() => {
     dispatch(listtask());
   }, []);
@@ -128,6 +135,9 @@ const Mynotes = React.memo(function Mynotes() {
   const handleClick = (taskObj) => {
     setModalObj(taskObj);
     setTaskstatus(taskObj?.task_status);
+    setTempTitle(taskObj?.title);
+    setTempContent(taskObj?.content);
+    setTempCategory(taskObj?.category);
     setOpen(true);
   };
   const handleClose = () => {
@@ -136,8 +146,19 @@ const Mynotes = React.memo(function Mynotes() {
   const handleChange = () => {
     setTaskstatus(!taskstatus);
   };
-  const resetHandler = () => {};
-  const submitHandler = () => {};
+  const resetHandler = (taskObj) => {
+    setTaskstatus(taskObj?.task_status);
+    setTempTitle(taskObj?.title);
+    setTempContent(taskObj?.content);
+    setTempCategory(taskObj?.category);
+  };
+  const submitHandler = (taskObj) => {
+    const id = taskObj?._id;
+    dispatch(
+      updatetaskAction(id, tempTitle, tempCategory, tempContent, taskstatus)
+    );
+    setOpen(false);
+  };
   const handledelete = (id) => {
     dispatch(deletetaskAction(id));
   };
@@ -164,15 +185,15 @@ const Mynotes = React.memo(function Mynotes() {
               variant="outlined"
               label="Title"
               fullWidth
-              value={modalObj?.title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={tempTitle}
+              onChange={(e) => setTempTitle(e.target.value)}
               sx={{ m: 1 }}
             />
             <TextField
               label="Category"
               fullWidth
-              value={modalObj?.category}
-              onChange={(e) => setCategory(e.target.value)}
+              value={tempCategory}
+              onChange={(e) => setTempCategory(e.target.value)}
               sx={{ m: 1 }}
             />
             <TextField
@@ -180,9 +201,9 @@ const Mynotes = React.memo(function Mynotes() {
               multiline
               fullWidth
               maxRows={8}
-              value={modalObj?.content}
+              value={tempContent}
               sx={{ m: 1 }}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => setTempContent(e.target.value)}
             />
             <FormControlLabel
               label={
@@ -210,10 +231,14 @@ const Mynotes = React.memo(function Mynotes() {
           </DialogContent>
 
           <DialogActions>
-            <Button variant="contained" color="error" onClick={resetHandler}>
-              Discard changes
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => resetHandler(modalObj)}
+            >
+              Reset changes
             </Button>
-            <Button variant="contained" onClick={submitHandler}>
+            <Button variant="contained" onClick={() => submitHandler(modalObj)}>
               Save Changes
             </Button>
           </DialogActions>

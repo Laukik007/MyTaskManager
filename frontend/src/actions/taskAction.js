@@ -8,6 +8,9 @@ import {
   TASK_LIST_FAIL,
   TASK_LIST_REQUEST,
   TASK_LIST_SUCCESS,
+  EXPLORE_LIST_FAIL,
+  EXPLORE_LIST_REQUEST,
+  EXPLORE_LIST_SUCCESS,
   TASK_UPDATE_FAIL,
   TASK_UPDATE_REQUEST,
   TASK_UPDATE_SUCCESS,
@@ -41,6 +44,39 @@ export const listtask = () => async (dispatch, getState) => {
         : error.message;
     dispatch({
       type: TASK_LIST_FAIL,
+      payload: message,
+    });
+  }
+};
+
+export const ExploreTasks = () => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: EXPLORE_LIST_REQUEST,
+    });
+
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const id = userInfo?._id;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/${id}`, config);
+
+    dispatch({
+      type: EXPLORE_LIST_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+    dispatch({
+      type: EXPLORE_LIST_FAIL,
       payload: message,
     });
   }
@@ -81,6 +117,7 @@ export const createtaskAction =
         payload: data,
       });
       dispatch(listtask());
+      dispatch(ExploreTasks());
     } catch (error) {
       const message =
         error.response && error.response.data.message
@@ -117,6 +154,7 @@ export const deletetaskAction = (id) => async (dispatch, getState) => {
       payload: data,
     });
     dispatch(listtask());
+    dispatch(ExploreTasks());
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -130,7 +168,8 @@ export const deletetaskAction = (id) => async (dispatch, getState) => {
 };
 
 export const updatetaskAction =
-  (id, title, content, category, task_status) => async (dispatch, getState) => {
+  (id, tempTitle, tempCategory, tempContent, taskstatus) =>
+  async (dispatch, getState) => {
     try {
       dispatch({
         type: TASK_UPDATE_REQUEST,
@@ -149,7 +188,12 @@ export const updatetaskAction =
 
       const { data } = await axios.put(
         `/api/tasks/${id}`,
-        { title, content, category, task_status },
+        {
+          title: tempTitle,
+          content: tempContent,
+          category: tempCategory,
+          task_status: taskstatus,
+        },
         config
       );
 
@@ -158,6 +202,7 @@ export const updatetaskAction =
         payload: data,
       });
       dispatch(listtask());
+      dispatch(ExploreTasks());
     } catch (error) {
       const message =
         error.response && error.response.data.message

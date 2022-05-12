@@ -6,6 +6,7 @@ import {
   taskDeleteReducer,
   taskListReducer,
   taskUpdateReducer,
+  taskExploreReducer,
 } from "./reducers/taskReducers";
 import {
   userLoginReducer,
@@ -15,6 +16,7 @@ import {
 
 const reducer = combineReducers({
   taskList: taskListReducer,
+  taskExplore: taskExploreReducer,
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
   taskCreate: taskCreateReducer,

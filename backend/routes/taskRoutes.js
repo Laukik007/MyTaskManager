@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  getTaskById,
+  getTaskExplore,
   getTasks,
   CreateTask,
   DeleteTask,
@@ -12,7 +12,7 @@ const { protect } = require("../middleware/authMiddleware");
 router.route("/").get(protect, getTasks);
 router
   .route("/:id")
-  .get(getTaskById)
+  .get(getTaskExplore)
   .delete(protect, DeleteTask)
   .put(protect, UpdateTask);
 router.route("/create").post(protect, CreateTask);
