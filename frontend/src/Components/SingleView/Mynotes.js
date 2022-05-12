@@ -248,6 +248,7 @@ const Mynotes = React.memo(function Mynotes() {
         container
         alignItems="stretch"
         direction="row"
+        spacing={2}
         justifyContent={"space-around"}
       >
         {TASK != undefined ? (
@@ -256,12 +257,26 @@ const Mynotes = React.memo(function Mynotes() {
               <Card
                 className={classes.card}
                 sx={{ width: 270 }}
-                style={{ backgroundColor: colors[idx % 9] }}
+                style={
+                  taskObj?.task_status
+                    ? {
+                        backgroundColor: colors[idx % 9],
+                        textDecoration: "line-through",
+                      }
+                    : { backgroundColor: colors[idx % 9] }
+                }
               >
                 <CardActionArea>
                   <CardHeader
                     title={taskObj?.title}
                     className={classes.cardheader}
+                    style={
+                      taskObj?.task_status
+                        ? {
+                            textDecoration: "line-through",
+                          }
+                        : {}
+                    }
                   />
                   <CardContent onClick={() => handleClick(taskObj)}>
                     <Typography

@@ -85,10 +85,10 @@ const UpdateTask = asyncHandler(async (req, res) => {
 
   const Tasks = await Task.findById(req.params.id);
 
-  if (Tasks.user.toString() !== req.user._id.toString()) {
-    res.status(401);
-    throw new Error("You can't perform this action");
-  }
+  //   if (Tasks.user.toString() !== req.user._id.toString()) {
+  //     res.status(401);
+  //     throw new Error("You can't perform this action");
+  //   }
 
   if (Tasks) {
     Tasks.title = title;
