@@ -1,6 +1,7 @@
 const express = require("express");
 const userRoutes = require("./routes/userRoutes");
 const dotenv = require("dotenv");
+const path = require('path');
 const connectDB = require("./config/db");
 const taskRoutes = require("./routes/taskRoutes");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
@@ -12,7 +13,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/users", userRoutes);
 
 // --------------------------deployment------------------------------
-// const __dirname1 = path.resolve();
+const __dirname = path.resolve();
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/build")));
